@@ -1,3 +1,5 @@
+/*
+
 const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
@@ -76,4 +78,72 @@ app.post('/login', (req, res) => {
 // Khởi động server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
+});
+
+*/
+
+const express = require('express');
+const mysql = require('mysql2');
+const app = express();
+const cors = require('cors');
+const port = 3000;
+
+
+app.use(cors());
+
+// Kết nối cơ sở dữ liệu (thay đổi thông tin kết nối phù hợp)
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: null,
+  database: 'dtb'
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err);
+  } else {
+    console.log('Connected to database!');
+  }
+});
+
+// Định nghĩa route API để lấy chi tiết sản phẩm dựa trên id
+app.get('/api/products/:id', (req, res) => {
+  const productId = req.params.id;
+
+  // Truy vấn dữ liệu sản phẩm dựa trên ID từ bảng "product"
+  const query = 'SELECT * FROM product WHERE id = ?';
+
+  connection.query(query, [productId], (err, results) => {
+    if (err) {
+      console.error('Error fetching product:', err);
+      res.status(500).json({ error: 'Error fetching product.' });
+    } else {
+      if (results.length > 0) {
+        // Trả về dữ liệu sản phẩm dưới dạng JSON
+        res.json(results[0]);
+      } else {
+        res.status(404).json({ error: 'Product not found.' });
+      }
+    }
+  });
+});
+
+app.get('/api/reproducts/:type', (req, res) => {
+  const { type } = req.params;
+  
+  // Truy vấn cơ sở dữ liệu để lấy ra các sản phẩm có cùng type
+  const sqlQuery = `SELECT * FROM product WHERE type = ?`;
+  connection.query(sqlQuery, [type], (err, result) => {
+    if (err) {
+      res.status(500).json({ error: 'Error fetching product.' });
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+// Khởi chạy server
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
 });
