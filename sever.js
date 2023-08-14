@@ -143,6 +143,27 @@ app.get('/api/reproducts/:type', (req, res) => {
   });
 });
 
+app.get('/api/products', (req, res) => {
+  // Truy vấn dữ liệu sản phẩm từ bảng "product"
+  const query = 'SELECT name, price, image_url, type, id FROM product';
+  connection.query(query, (error, results) => {
+      if (error) {
+          console.error('Error querying database:', error);
+          res.status(500).json({ error: 'Error querying database' });
+      } else {
+          // Trả về mảng products chứa thông tin của sản phẩm
+          const products = results.map(result => ({
+              name: result.name,
+              price: result.price,
+              image_url: result.image_url,
+              type: result.type,
+              id: result.id
+          }));
+          res.json(products);
+      }
+  });
+});
+
 // Khởi chạy server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
