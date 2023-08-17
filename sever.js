@@ -1,91 +1,8 @@
-/*
-
-const express = require('express');
-const mysql = require('mysql');
-const bodyParser = require('body-parser');
-const cors = require('cors');
-
-const app = express();
-const port = 3000;
-
-// Cấu hình kết nối với cơ sở dữ liệu MySQL
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: null,
-  database: 'ngu'
-});
-
-// Kết nối tới cơ sở dữ liệu MySQL
-db.connect((err) => {
-  if (err) {
-    throw err;
-  }
-  console.log('Connected to MySQL database');
-});
-
-// Sử dụng body-parser middleware để truy cập dữ liệu gửi lên từ form
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(cors());
-
-// Đăng ký tài khoản
-app.post('/register', (req, res) => {
-    const { username, phone, email, password } = req.body;
-  
-    // Kiểm tra xem người dùng đã tồn tại trong cơ sở dữ liệu chưa
-    const checkUserQuery = `SELECT * FROM users WHERE email = ?`;
-    db.query(checkUserQuery, [email], (err, result) => {
-      if (err) {
-        throw err;
-      }
-  
-      if (result.length > 0) {
-        res.send('Email đã được sử dụng. Vui lòng chọn email khác.');
-      } else {
-        // Nếu người dùng không tồn tại, thêm tài khoản mới vào cơ sở dữ liệu
-        const createUserQuery = `INSERT INTO users (username, phone, email, password) VALUES (?, ?, ?, ?)`;
-        db.query(createUserQuery, [username, phone, email, password], (err, result) => {
-          if (err) {
-            throw err;
-          }
-          res.send('Đăng ký thành công!');
-        });
-      }
-    });
-  });
-  
-
-// Đăng nhập
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-
-  // Kiểm tra xem người dùng tồn tại trong cơ sở dữ liệu và mật khẩu khớp hay không
-  const checkUserQuery = `SELECT * FROM users WHERE email = ? AND password = ?`;
-  db.query(checkUserQuery, [email, password], (err, result) => {
-    if (err) {
-      throw err;
-    }
-
-    if (result.length > 0) {
-      res.send('Đăng nhập thành công!');
-    } else {
-      res.send('Email hoặc mật khẩu không đúng.');
-    }
-  });
-});
-
-// Khởi động server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-*/
-
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
 const cors = require('cors');
+const bodyParser = require('body-parser');
 const port = 3000;
 
 
@@ -161,6 +78,73 @@ app.get('/api/products', (req, res) => {
           }));
           res.json(products);
       }
+  });
+});
+
+app.get("/api/search", (req, res) => {
+  const searchTerm = req.query.q; // Lấy tham số tìm kiếm từ URL
+
+  const query =
+    "SELECT name, image_url, price, id FROM product WHERE name LIKE ? OR type LIKE ?";
+  const searchValue = `%${searchTerm}%`;
+  connection.query(query, [searchValue, searchValue], (err, results) => {
+    if (err) {
+      console.error("Error executing query:", err);
+      res.status(500).json({ error: "An error occurred while processing your request." });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
+// Sử dụng body-parser middleware để truy cập dữ liệu gửi lên từ form
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cors());
+
+// Đăng ký tài khoản
+app.post('/register', (req, res) => {
+    const { username, phone, email, password } = req.body;
+  
+    // Kiểm tra xem người dùng đã tồn tại trong cơ sở dữ liệu chưa
+    const checkUserQuery = `SELECT * FROM users WHERE email = ?`;
+    connection.query(checkUserQuery, [email], (err, result) => {
+      if (err) {
+        throw err;
+      }
+  
+      if (result.length > 0) {
+        res.send('Email đã được sử dụng. Vui lòng chọn email khác.');
+      } else {
+        // Nếu người dùng không tồn tại, thêm tài khoản mới vào cơ sở dữ liệu
+        const createUserQuery = `INSERT INTO users (username, phone, email, password) VALUES (?, ?, ?, ?)`;
+        connection.query(createUserQuery, [username, phone, email, password], (err, result) => {
+          if (err) {
+            throw err;
+          }
+          res.send('Đăng ký thành công!');
+        });
+      }
+    });
+  });
+  
+
+// Đăng nhập
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  // Kiểm tra xem người dùng tồn tại trong cơ sở dữ liệu và mật khẩu khớp hay không
+  const checkUserQuery = `SELECT * FROM users WHERE email = ? AND password = ?`;
+  connection.query(checkUserQuery, [email, password], (err, result) => {
+    if (err) {
+      throw err;
+    }
+
+    if (result.length > 0) {
+      res.send('Đăng nhập thành công!');
+    } else {
+      res.send('Email hoặc mật khẩu không đúng.');
+    }
   });
 });
 
