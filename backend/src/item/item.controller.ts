@@ -9,7 +9,7 @@ export class ItemController {
 
   @Post()
   create(@Body() createItemDto: CreateItemDto) {
-    return this.itemService.create(createItemDto);
+    return "wtf";
   }
 
   @Get()
@@ -19,7 +19,7 @@ export class ItemController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.itemService.findOne(+id);
+    return this.itemService.findByPk(+id);
   }
 
   @Patch(':id')
@@ -29,6 +29,6 @@ export class ItemController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.itemService.remove(+id);
+    return "";
   }
 }

@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-
 @Injectable()
 export class ItemService {
-  create(createItemDto: CreateItemDto) {
-    return 'This action adds a new item';
+  constructor(@InjectModel(Item) private readonly itemModel: typeof Item) {}
+
+  async findAll(): Promise<Item[]> {
+    return this.itemModel.findAll();
   }
 
-  findAll() {
-    return `This action returns all item`;
+  async findById(id: number): Promise<Item> {
+    return this.itemModel.findByPk(id);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} item`;
+  async create(item: Item): Promise<Item> {
+    return this.itemModel.create(item);
   }
 
-  update(id: number, updateItemDto: UpdateItemDto) {
-    return `This action updates a #${id} item`;
+  async update(id: number, item: Item): Promise<[number, Item[]]> {
+    return this.itemModel.update(item, { where: { id } });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} item`;
+  async delete(id: number): Promise<number> {
+    return this.itemModel.destroy({ where: { id } });
+  }
+
+  async findOne(id: number): Promise<Item> {
+    return this.itemModel.findOne({ where: { id } });
   }
 }
