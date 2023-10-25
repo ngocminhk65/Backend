@@ -4,9 +4,15 @@ import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { ItemModule } from './item/item.module';
 import { MinioModule } from './minio/minio.module';
+import { AuthorModule } from './author/author.module';
+import { UserModule } from './user/user.module';
+import { CommentModule } from './comment/comment.module';
+import { ReportModule } from './report/report.module';
+import { AssigmentModule } from './assigment/assigment.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
-  imports: [DatabaseModule, ItemModule, MinioModule],
+  imports: [DatabaseModule, ItemModule, MinioModule, AuthorModule, UserModule, CommentModule, ReportModule, AssigmentModule, PermissionModule],
   controllers: [AppController],
   providers: [AppService],
 })
